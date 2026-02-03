@@ -1,9 +1,0 @@
-/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/f5e1-storage/voca-agent/target/debug/deps/futures_executor-6468d87232c9e493.d: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/local_pool.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/enter.rs
-
-/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/f5e1-storage/voca-agent/target/debug/deps/libfutures_executor-6468d87232c9e493.rlib: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/local_pool.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/enter.rs
-
-/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/f5e1-storage/voca-agent/target/debug/deps/libfutures_executor-6468d87232c9e493.rmeta: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/local_pool.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/enter.rs
-
-/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/lib.rs:
-/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/local_pool.rs:
-/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/futures-executor-0.3.31/src/enter.rs:
