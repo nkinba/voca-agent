@@ -1,0 +1,10 @@
+/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/1809-fetcher/voca-agent/target/debug/deps/untrusted-e8fd776117d76b2c.d: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/input.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/no_panic.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/reader.rs
+
+/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/1809-fetcher/voca-agent/target/debug/deps/libuntrusted-e8fd776117d76b2c.rlib: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/input.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/no_panic.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/reader.rs
+
+/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/1809-fetcher/voca-agent/target/debug/deps/libuntrusted-e8fd776117d76b2c.rmeta: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/input.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/no_panic.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/reader.rs
+
+/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/lib.rs:
+/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/input.rs:
+/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/no_panic.rs:
+/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/untrusted-0.9.0/src/reader.rs:
