@@ -1,9 +1,0 @@
-/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/88e1-chore-initialize/voca-agent/target/debug/deps/signal_hook_registry-766b40c07247446d.d: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs
-
-/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/88e1-chore-initialize/voca-agent/target/debug/deps/libsignal_hook_registry-766b40c07247446d.rlib: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs
-
-/private/var/folders/wv/2hb9n0v140d7wydrry1rj8300000gn/T/vibe-kanban/worktrees/88e1-chore-initialize/voca-agent/target/debug/deps/libsignal_hook_registry-766b40c07247446d.rmeta: /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs /Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs
-
-/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/lib.rs:
-/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/half_lock.rs:
-/Users/yoonsoochang/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/signal-hook-registry-1.4.8/src/vec_map.rs:
