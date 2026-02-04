@@ -8,8 +8,4 @@ async fn main() {
         .init();
 
     info!("Hello, voca-agent!");
-
-    voca_core::init();
-    voca_fetcher::init();
-    voca_storage::init();
 }

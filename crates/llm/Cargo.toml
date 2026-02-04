@@ -1,0 +1,16 @@
+[package]
+name = "voca-llm"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+voca-core = { workspace = true }
+rig-core = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+async-trait = "0.1"
+dotenvy = "0.15"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

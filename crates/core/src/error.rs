@@ -9,6 +9,9 @@ pub enum CoreError {
     #[error("Database error: {0}")]
     Database(String),
 
+    #[error("LLM error: {0}")]
+    Llm(String),
+
     #[error("Unknown error: {0}")]
     Unknown(String),
 }
