@@ -9,7 +9,7 @@ const SYSTEM_PROMPT: &str = r#"You are a strict TOEFL exam creator. Identify 3-5
 - 'context_sentence': The sentence from the text containing the word."#;
 
 const GEMINI_API_URL: &str =
-    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ExtractedWord {
@@ -82,7 +82,7 @@ impl GeminiLlmEngine {
 
         Ok(Self {
             api_key,
-            model: "gemini-1.5-flash".to_string(),
+            model: "gemini-2.5-flash".to_string(),
             client: reqwest::Client::new(),
         })
     }
@@ -186,7 +186,7 @@ mod tests {
     fn create_test_engine() -> GeminiLlmEngine {
         GeminiLlmEngine {
             api_key: "test_key".to_string(),
-            model: "gemini-1.5-flash".to_string(),
+            model: "gemini-2.5-flash".to_string(),
             client: reqwest::Client::new(),
         }
     }
