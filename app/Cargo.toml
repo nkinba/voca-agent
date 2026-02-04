@@ -6,6 +6,7 @@ edition = "2021"
 [dependencies]
 voca-core = { workspace = true }
 voca-fetcher = { workspace = true }
+voca-integration = { workspace = true }
 voca-storage = { workspace = true }
 voca-llm = { workspace = true }
 
@@ -15,3 +16,4 @@ tracing-subscriber = { workspace = true }
 thiserror = { workspace = true }
 chrono = "0.4"
 async-trait = "0.1"
+clap = { version = "4", features = ["derive"] }
