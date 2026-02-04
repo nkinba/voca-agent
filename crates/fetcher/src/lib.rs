@@ -1,9 +1,18 @@
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use rss::Channel;
+use scraper::{Html, Selector};
 use std::io::BufReader;
 
 use voca_core::{Article, CoreError, FetcherPort, SourceType};
+
+/// RSS feed item metadata (URL and title)
+#[derive(Debug, Clone)]
+pub struct FeedItem {
+    pub url: String,
+    pub title: String,
+    pub published_at: DateTime<Utc>,
+}
 
 pub struct RssFetcher {
     client: reqwest::Client,
@@ -15,6 +24,95 @@ impl RssFetcher {
             client: reqwest::Client::new(),
         }
     }
+
+    /// Fetch all items from an RSS feed
+    pub async fn fetch_feed(&self, feed_url: &str) -> Result<Vec<FeedItem>, CoreError> {
+        let response = self
+            .client
+            .get(feed_url)
+            .send()
+            .await
+            .map_err(|e| CoreError::Network(e.to_string()))?;
+
+        let bytes = response
+            .bytes()
+            .await
+            .map_err(|e| CoreError::Network(e.to_string()))?;
+
+        let channel = Channel::read_from(BufReader::new(bytes.as_ref()))
+            .map_err(|e| CoreError::Parse(e.to_string()))?;
+
+        let items: Vec<FeedItem> = channel
+            .items()
+            .iter()
+            .filter_map(|item| {
+                let url = item.link()?.to_string();
+                let title = item.title().unwrap_or("Untitled").to_string();
+                let published_at = item
+                    .pub_date()
+                    .and_then(|d| DateTime::parse_from_rfc2822(d).ok())
+                    .map(|dt| dt.with_timezone(&Utc))
+                    .unwrap_or_else(Utc::now);
+
+                Some(FeedItem {
+                    url,
+                    title,
+                    published_at,
+                })
+            })
+            .collect();
+
+        Ok(items)
+    }
+
+    /// Fetch the body content of a URL and convert to plain text
+    pub async fn fetch_body(&self, url: &str) -> Result<String, CoreError> {
+        let response = self
+            .client
+            .get(url)
+            .send()
+            .await
+            .map_err(|e| CoreError::Network(e.to_string()))?;
+
+        let html = response
+            .text()
+            .await
+            .map_err(|e| CoreError::Network(e.to_string()))?;
+
+        // Parse HTML and extract text content
+        let document = Html::parse_document(&html);
+
+        // Try to extract main content (article, main, or body)
+        let content = extract_main_content(&document);
+
+        Ok(content)
+    }
+}
+
+/// Extract main text content from HTML document
+fn extract_main_content(document: &Html) -> String {
+    // Try to find article or main content first
+    let selectors = ["article", "main", "[role=\"main\"]", ".content", ".post-content", "body"];
+
+    for selector_str in selectors {
+        if let Ok(selector) = Selector::parse(selector_str) {
+            if let Some(element) = document.select(&selector).next() {
+                let text: String = element
+                    .text()
+                    .collect::<Vec<_>>()
+                    .join(" ")
+                    .split_whitespace()
+                    .collect::<Vec<_>>()
+                    .join(" ");
+
+                if !text.is_empty() {
+                    return text;
+                }
+            }
+        }
+    }
+
+    String::new()
 }
 
 impl Default for RssFetcher {
