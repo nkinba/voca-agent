@@ -1,26 +1,15 @@
 use async_trait::async_trait;
-use rig::completion::Prompt;
-use rig::providers::openai;
 use serde::{Deserialize, Serialize};
 
 use voca_core::{CoreError, LlmPort, Vocabulary};
 
-const SYSTEM_PROMPT: &str = r#"You are a strict TOEFL exam creator. Identify 3-5 distinct English words from the text that are CEFR Level C1 or C2.
-Ignore common words. For each word, provide:
-1. The word itself (lemma form).
-2. A concise definition in English suitable for academic context.
-3. The specific sentence from the text where it was used (context).
+const SYSTEM_PROMPT: &str = r#"You are a strict TOEFL exam creator. Identify 3-5 distinct English words from the text that are CEFR Level C1 or C2. Ignore common words. Output a JSON list of objects with the following keys:
+- 'word': The lemma of the word.
+- 'definition': A concise academic definition.
+- 'context_sentence': The sentence from the text containing the word."#;
 
-Output must be valid JSON array with the following structure:
-[
-  {
-    "word": "string",
-    "definition": "string",
-    "context_sentence": "string"
-  }
-]
-
-Only output the JSON array, no other text."#;
+const GEMINI_API_URL: &str =
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent";
 
 #[derive(Debug, Serialize, Deserialize)]
 struct ExtractedWord {
@@ -29,23 +18,72 @@ struct ExtractedWord {
     context_sentence: String,
 }
 
-pub struct RigLlmEngine {
-    client: openai::Client,
-    model: String,
+#[derive(Debug, Serialize)]
+struct GeminiRequest {
+    contents: Vec<GeminiContent>,
+    #[serde(rename = "generationConfig")]
+    generation_config: GenerationConfig,
 }
 
-impl RigLlmEngine {
+#[derive(Debug, Serialize)]
+struct GeminiContent {
+    parts: Vec<GeminiPart>,
+}
+
+#[derive(Debug, Serialize)]
+struct GeminiPart {
+    text: String,
+}
+
+#[derive(Debug, Serialize)]
+struct GenerationConfig {
+    #[serde(rename = "responseMimeType")]
+    response_mime_type: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct GeminiResponse {
+    candidates: Option<Vec<GeminiCandidate>>,
+    error: Option<GeminiError>,
+}
+
+#[derive(Debug, Deserialize)]
+struct GeminiCandidate {
+    content: GeminiContentResponse,
+}
+
+#[derive(Debug, Deserialize)]
+struct GeminiContentResponse {
+    parts: Vec<GeminiPartResponse>,
+}
+
+#[derive(Debug, Deserialize)]
+struct GeminiPartResponse {
+    text: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct GeminiError {
+    message: String,
+}
+
+pub struct GeminiLlmEngine {
+    api_key: String,
+    model: String,
+    client: reqwest::Client,
+}
+
+impl GeminiLlmEngine {
     pub fn new() -> Result<Self, CoreError> {
         dotenvy::dotenv().ok();
 
-        let api_key = std::env::var("OPENAI_API_KEY")
-            .map_err(|_| CoreError::Llm("OPENAI_API_KEY not found in environment".to_string()))?;
-
-        let client = openai::Client::new(&api_key);
+        let api_key = std::env::var("GEMINI_API_KEY")
+            .map_err(|_| CoreError::Llm("GEMINI_API_KEY not found in environment".to_string()))?;
 
         Ok(Self {
-            client,
-            model: "gpt-4o-mini".to_string(),
+            api_key,
+            model: "gemini-1.5-flash".to_string(),
+            client: reqwest::Client::new(),
         })
     }
 
@@ -82,33 +120,60 @@ impl RigLlmEngine {
     }
 }
 
-impl Default for RigLlmEngine {
-    fn default() -> Self {
-        Self::new().expect("Failed to create RigLlmEngine with default settings")
-    }
-}
-
 #[async_trait]
-impl LlmPort for RigLlmEngine {
+impl LlmPort for GeminiLlmEngine {
     async fn extract(&self, text: &str) -> Result<Vec<Vocabulary>, CoreError> {
-        let agent = self
+        let prompt = format!("{}\n\nTarget Text:\n{}", SYSTEM_PROMPT, text);
+
+        let request_body = GeminiRequest {
+            contents: vec![GeminiContent {
+                parts: vec![GeminiPart { text: prompt }],
+            }],
+            generation_config: GenerationConfig {
+                response_mime_type: "application/json".to_string(),
+            },
+        };
+
+        let url = format!("{}?key={}", GEMINI_API_URL, self.api_key);
+
+        let response = self
             .client
-            .agent(&self.model)
-            .preamble(SYSTEM_PROMPT)
-            .build();
-
-        let user_prompt = format!(
-            "Extract vocabulary words from the following text:\n\n{}",
-            text
-        );
-
-        let response = agent
-            .prompt(user_prompt)
+            .post(&url)
+            .json(&request_body)
+            .send()
             .await
-            .map_err(|e| CoreError::Llm(e.to_string()))?;
+            .map_err(|e| CoreError::Network(e.to_string()))?;
 
-        let extracted: Vec<ExtractedWord> =
-            serde_json::from_str(&response).map_err(|e| CoreError::Parse(e.to_string()))?;
+        if !response.status().is_success() {
+            let status = response.status();
+            let error_text = response
+                .text()
+                .await
+                .unwrap_or_else(|_| "Unknown error".to_string());
+            return Err(CoreError::Llm(format!(
+                "Gemini API error ({}): {}",
+                status, error_text
+            )));
+        }
+
+        let gemini_response: GeminiResponse = response
+            .json()
+            .await
+            .map_err(|e| CoreError::Parse(format!("Failed to parse Gemini response: {}", e)))?;
+
+        if let Some(error) = gemini_response.error {
+            return Err(CoreError::Llm(format!("Gemini API error: {}", error.message)));
+        }
+
+        let text_response = gemini_response
+            .candidates
+            .and_then(|c| c.into_iter().next())
+            .and_then(|c| c.content.parts.into_iter().next())
+            .map(|p| p.text)
+            .ok_or_else(|| CoreError::Parse("No content in Gemini response".to_string()))?;
+
+        let extracted: Vec<ExtractedWord> = serde_json::from_str(&text_response)
+            .map_err(|e| CoreError::Parse(format!("Failed to parse vocabulary JSON: {}", e)))?;
 
         Ok(self.filter_words(extracted, ""))
     }
@@ -118,12 +183,17 @@ impl LlmPort for RigLlmEngine {
 mod tests {
     use super::*;
 
+    fn create_test_engine() -> GeminiLlmEngine {
+        GeminiLlmEngine {
+            api_key: "test_key".to_string(),
+            model: "gemini-1.5-flash".to_string(),
+            client: reqwest::Client::new(),
+        }
+    }
+
     #[test]
     fn test_filter_short_words() {
-        let engine = RigLlmEngine {
-            client: openai::Client::new("test"),
-            model: "test".to_string(),
-        };
+        let engine = create_test_engine();
 
         let words = vec![
             ExtractedWord {
@@ -146,10 +216,7 @@ mod tests {
 
     #[test]
     fn test_filter_stop_words() {
-        let engine = RigLlmEngine {
-            client: openai::Client::new("test"),
-            model: "test".to_string(),
-        };
+        let engine = create_test_engine();
 
         let words = vec![
             ExtractedWord {
@@ -185,5 +252,23 @@ mod tests {
         let words = parsed.unwrap();
         assert_eq!(words.len(), 1);
         assert_eq!(words[0].word, "ephemeral");
+    }
+
+    #[test]
+    fn test_gemini_request_serialization() {
+        let request = GeminiRequest {
+            contents: vec![GeminiContent {
+                parts: vec![GeminiPart {
+                    text: "Test prompt".to_string(),
+                }],
+            }],
+            generation_config: GenerationConfig {
+                response_mime_type: "application/json".to_string(),
+            },
+        };
+
+        let json = serde_json::to_string(&request).unwrap();
+        assert!(json.contains("responseMimeType"));
+        assert!(json.contains("application/json"));
     }
 }

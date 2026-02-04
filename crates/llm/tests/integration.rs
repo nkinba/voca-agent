@@ -1,10 +1,10 @@
 //! Integration tests for voca-llm
 //!
-//! These tests require a valid OPENAI_API_KEY environment variable.
+//! These tests require a valid GEMINI_API_KEY environment variable.
 //! Run with: cargo test --package voca-llm --test integration -- --ignored
 
 use voca_core::LlmPort;
-use voca_llm::RigLlmEngine;
+use voca_llm::GeminiLlmEngine;
 
 const SAMPLE_TEXT: &str = r#"
 The phenomenon of cognitive dissonance, first articulated by Leon Festinger in 1957,
@@ -17,9 +17,9 @@ significance in understanding human behavior.
 "#;
 
 #[tokio::test]
-#[ignore = "requires OPENAI_API_KEY"]
+#[ignore = "requires GEMINI_API_KEY"]
 async fn test_extract_vocabulary_from_text() {
-    let engine = RigLlmEngine::new().expect("Failed to create RigLlmEngine");
+    let engine = GeminiLlmEngine::new().expect("Failed to create GeminiLlmEngine");
 
     let result = engine.extract(SAMPLE_TEXT).await;
 
@@ -48,9 +48,9 @@ async fn test_extract_vocabulary_from_text() {
 }
 
 #[tokio::test]
-#[ignore = "requires OPENAI_API_KEY"]
+#[ignore = "requires GEMINI_API_KEY"]
 async fn test_extract_with_simple_text() {
-    let engine = RigLlmEngine::new().expect("Failed to create RigLlmEngine");
+    let engine = GeminiLlmEngine::new().expect("Failed to create GeminiLlmEngine");
 
     let simple_text = "The ephemeral nature of fame often leads to existential contemplation.";
 
