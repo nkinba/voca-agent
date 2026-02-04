@@ -4,4 +4,4 @@ pub mod port;
 
 pub use error::CoreError;
 pub use model::{Article, SourceType, Vocabulary};
-pub use port::{FetcherPort, StoragePort};
+pub use port::{FetcherPort, LlmPort, StoragePort};

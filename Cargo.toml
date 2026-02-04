@@ -37,3 +37,4 @@ serde_json = "1"
 voca-core = { path = "crates/core" }
 voca-fetcher = { path = "crates/fetcher" }
 voca-storage = { path = "crates/storage" }
+voca-llm = { path = "crates/llm" }
