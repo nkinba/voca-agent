@@ -137,6 +137,54 @@ cargo test test_article_crud
 - `test_vocabulary_crud`: Vocabulary 저장
 - `test_duplicate_article_ignored`: 중복 Article 무시 (INSERT OR IGNORE)
 
+### 수동 통합 테스트 (파일 DB)
+
+단위 테스트는 인메모리 DB(`sqlite::memory:`)를 사용합니다. 실제 파일 기반 DB로 테스트하려면:
+
+```bash
+# SQLite CLI로 직접 확인
+sqlite3 /tmp/voca_test.db
+
+# 테이블 스키마 확인
+.schema
+
+# 데이터 조회
+SELECT * FROM articles;
+SELECT * FROM vocabularies;
+
+# 종료
+.quit
+```
+
+**SqliteStorage 사용 예시** (Rust 코드):
+
+```rust
+use voca_storage::SqliteStorage;
+use voca_core::{Article, Vocabulary, SourceType, StoragePort};
+use chrono::Utc;
+
+#[tokio::main]
+async fn main() {
+    // 파일 기반 DB 생성 (mode=rwc: read/write/create)
+    let storage = SqliteStorage::new("sqlite:/tmp/voca_test.db?mode=rwc")
+        .await
+        .expect("Failed to create storage");
+
+    let article = Article {
+        url: "https://example.com/test".to_string(),
+        title: "Test".to_string(),
+        content: "Content".to_string(),
+        source: SourceType::RSS,
+        published_at: Utc::now(),
+        collected_at: Utc::now(),
+    };
+
+    // 저장 및 확인
+    storage.save_article(&article).await.unwrap();
+    assert!(storage.exists(&article.url).await.unwrap());
+}
+```
+
 ## 코드 품질
 
 ### 포맷팅
