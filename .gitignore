@@ -25,3 +25,7 @@ Thumbs.db
 
 # Debug
 *.log
+
+# Environment variables (API keys, secrets)
+.env
+.env.*
