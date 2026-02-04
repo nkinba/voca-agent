@@ -3,7 +3,7 @@ mod workflow;
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
-use tracing::{error, info};
+use tracing::{error, info, warn};
 use tracing_subscriber::EnvFilter;
 
 use voca_fetcher::RssFetcher;
@@ -17,6 +17,10 @@ const DEFAULT_FEED_URLS: &[&str] = &["https://blog.rust-lang.org/feed.xml"];
 /// Default SQLite database path
 const DEFAULT_DB_URL: &str = "sqlite:voca-agent.db?mode=rwc";
 
+/// Environment variable names
+const ENV_OBSIDIAN_VAULT_PATH: &str = "OBSIDIAN_VAULT_PATH";
+const ENV_OBSIDIAN_NOTE_PATH: &str = "OBSIDIAN_NOTE_PATH";
+
 #[derive(Parser)]
 #[command(name = "voca-agent")]
 #[command(about = "Vocabulary collection agent with Obsidian and MCP integration")]
@@ -29,7 +33,7 @@ struct Cli {
 enum Commands {
     /// Run the vocabulary collection pipeline (default)
     Run {
-        /// Obsidian vault path for exporting vocabulary
+        /// Obsidian vault path for exporting vocabulary (overrides OBSIDIAN_VAULT_PATH env)
         #[arg(long)]
         obsidian_path: Option<PathBuf>,
     },
@@ -37,14 +41,43 @@ enum Commands {
     Mcp,
     /// Export all vocabulary to Obsidian
     Export {
-        /// Obsidian vault path
-        #[arg(long, required = true)]
-        obsidian_path: PathBuf,
+        /// Obsidian vault path (overrides OBSIDIAN_VAULT_PATH env)
+        #[arg(long)]
+        obsidian_path: Option<PathBuf>,
     },
+}
+
+/// Get Obsidian export path from CLI arg or environment variables
+fn get_obsidian_path(cli_path: Option<PathBuf>) -> Option<PathBuf> {
+    // CLI arg takes precedence
+    if let Some(path) = cli_path {
+        return Some(path);
+    }
+
+    // Try OBSIDIAN_NOTE_PATH first (more specific)
+    if let Ok(note_path) = std::env::var(ENV_OBSIDIAN_NOTE_PATH) {
+        if !note_path.is_empty() {
+            info!(path = %note_path, "Using OBSIDIAN_NOTE_PATH from environment");
+            return Some(PathBuf::from(note_path));
+        }
+    }
+
+    // Fall back to OBSIDIAN_VAULT_PATH
+    if let Ok(vault_path) = std::env::var(ENV_OBSIDIAN_VAULT_PATH) {
+        if !vault_path.is_empty() {
+            info!(path = %vault_path, "Using OBSIDIAN_VAULT_PATH from environment");
+            return Some(PathBuf::from(vault_path));
+        }
+    }
+
+    None
 }
 
 #[tokio::main]
 async fn main() {
+    // Load .env file (ignore errors if file doesn't exist)
+    dotenvy::dotenv().ok();
+
     // Initialize tracing
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
@@ -54,9 +87,16 @@ async fn main() {
 
     match cli.command {
         Some(Commands::Mcp) => run_mcp_server().await,
-        Some(Commands::Export { obsidian_path }) => run_export(obsidian_path).await,
-        Some(Commands::Run { obsidian_path }) => run_pipeline(obsidian_path).await,
-        None => run_pipeline(None).await,
+        Some(Commands::Export { obsidian_path }) => {
+            let path = get_obsidian_path(obsidian_path);
+            if let Some(p) = path {
+                run_export(p).await;
+            } else {
+                error!("No Obsidian path provided. Use --obsidian-path or set OBSIDIAN_VAULT_PATH/OBSIDIAN_NOTE_PATH in .env");
+            }
+        }
+        Some(Commands::Run { obsidian_path }) => run_pipeline(get_obsidian_path(obsidian_path)).await,
+        None => run_pipeline(get_obsidian_path(None)).await,
     }
 }
 
@@ -91,6 +131,8 @@ async fn run_pipeline(obsidian_path: Option<PathBuf>) {
             if let Some(path) = obsidian_path {
                 info!(path = %path.display(), "Exporting vocabulary to Obsidian");
                 export_to_obsidian(&storage, &path).await;
+            } else {
+                warn!("No Obsidian path configured. Set OBSIDIAN_VAULT_PATH or OBSIDIAN_NOTE_PATH in .env to auto-export");
             }
         }
         Err(e) => {
@@ -132,6 +174,17 @@ async fn run_export(obsidian_path: PathBuf) {
 
 async fn export_to_obsidian(storage: &SqliteStorage, path: &PathBuf) {
     use voca_core::port::StoragePort;
+
+    // Verify path exists
+    if !path.exists() {
+        error!(path = %path.display(), "Obsidian path does not exist");
+        return;
+    }
+
+    if !path.is_dir() {
+        error!(path = %path.display(), "Obsidian path is not a directory");
+        return;
+    }
 
     let vocabs = match storage.get_all_vocab().await {
         Ok(v) => v,

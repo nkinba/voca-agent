@@ -17,3 +17,4 @@ thiserror = { workspace = true }
 chrono = "0.4"
 async-trait = "0.1"
 clap = { version = "4", features = ["derive"] }
+dotenvy = "0.15"
