@@ -9,7 +9,11 @@ async fn main() {
 
     info!("Hello, voca-agent!");
 
-    voca_core::init();
-    voca_fetcher::init();
-    voca_storage::init();
+    // TODO: Pipeline 구현 (PRD-005)
+    // 1. SqliteStorage 초기화
+    // 2. RssFetcher 초기화
+    // 3. LlmEngine 초기화 (PRD-004 구현 후)
+    // 4. RSS URL 순회 및 Article fetch
+    // 5. 중복 체크 및 저장
+    // 6. LLM 기반 Vocabulary 추출
 }
