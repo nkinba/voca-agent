@@ -97,8 +97,8 @@ voca-agent/
 ### Phase 1: Foundation (Current)
 - [x] Rust Workspace 구조 세팅.
 - [x] `voca-core` 정의 (Domain Model).
-- [In-Progress] `voca-fetcher` 구현 (RSS Parsing).
-- [In-Progress] `voca-storage` 구현 (SQLite).
+- [x] `voca-fetcher` 구현 (RSS Parsing).
+- [x] `voca-storage` 구현 (SQLite).
 
 ### Phase 2: Intelligence (Next)
 - [ ] `voca-llm` 모듈 구현 (Prompt Engineering & API Client).

@@ -14,3 +14,8 @@ pub trait StoragePort: Send + Sync {
     async fn save_article(&self, article: &Article) -> Result<(), CoreError>;
     async fn save_vocab(&self, vocab: &Vocabulary) -> Result<(), CoreError>;
 }
+
+#[async_trait]
+pub trait LlmPort: Send + Sync {
+    async fn extract(&self, text: &str) -> Result<Vec<Vocabulary>, CoreError>;
+}
