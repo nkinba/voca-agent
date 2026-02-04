@@ -20,6 +20,7 @@ const DEFAULT_DB_URL: &str = "sqlite:voca-agent.db?mode=rwc";
 /// Environment variable names
 const ENV_OBSIDIAN_VAULT_PATH: &str = "OBSIDIAN_VAULT_PATH";
 const ENV_OBSIDIAN_NOTE_PATH: &str = "OBSIDIAN_NOTE_PATH";
+const ENV_OBSIDIAN_INBOX_PATH: &str = "OBSIDIAN_INBOX_PATH";
 
 #[derive(Parser)]
 #[command(name = "voca-agent")]
@@ -54,7 +55,7 @@ fn get_obsidian_path(cli_path: Option<PathBuf>) -> Option<PathBuf> {
         return Some(path);
     }
 
-    // Try OBSIDIAN_NOTE_PATH first (more specific)
+    // Try OBSIDIAN_NOTE_PATH first (absolute path, most specific)
     if let Ok(note_path) = std::env::var(ENV_OBSIDIAN_NOTE_PATH) {
         if !note_path.is_empty() {
             info!(path = %note_path, "Using OBSIDIAN_NOTE_PATH from environment");
@@ -62,12 +63,27 @@ fn get_obsidian_path(cli_path: Option<PathBuf>) -> Option<PathBuf> {
         }
     }
 
-    // Fall back to OBSIDIAN_VAULT_PATH
-    if let Ok(vault_path) = std::env::var(ENV_OBSIDIAN_VAULT_PATH) {
-        if !vault_path.is_empty() {
-            info!(path = %vault_path, "Using OBSIDIAN_VAULT_PATH from environment");
-            return Some(PathBuf::from(vault_path));
+    // Get vault path (needed for INBOX_PATH resolution)
+    let vault_path = std::env::var(ENV_OBSIDIAN_VAULT_PATH).ok().filter(|s| !s.is_empty());
+
+    // Try OBSIDIAN_INBOX_PATH (relative to vault)
+    if let Ok(inbox_path) = std::env::var(ENV_OBSIDIAN_INBOX_PATH) {
+        if !inbox_path.is_empty() {
+            if let Some(ref vault) = vault_path {
+                let full_path = PathBuf::from(vault).join(&inbox_path);
+                info!(path = %full_path.display(), "Using OBSIDIAN_VAULT_PATH + OBSIDIAN_INBOX_PATH");
+                return Some(full_path);
+            } else {
+                warn!("OBSIDIAN_INBOX_PATH is set but OBSIDIAN_VAULT_PATH is not. Using INBOX_PATH as absolute path.");
+                return Some(PathBuf::from(inbox_path));
+            }
         }
+    }
+
+    // Fall back to OBSIDIAN_VAULT_PATH alone
+    if let Some(vault) = vault_path {
+        info!(path = %vault, "Using OBSIDIAN_VAULT_PATH from environment");
+        return Some(PathBuf::from(vault));
     }
 
     None
