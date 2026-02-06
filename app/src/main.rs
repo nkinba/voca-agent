@@ -8,9 +8,7 @@ use voca_llm::MockLlmEngine;
 use voca_storage::SqliteStorage;
 
 /// Default RSS feed URLs for testing
-const DEFAULT_FEED_URLS: &[&str] = &[
-    "https://blog.rust-lang.org/feed.xml",
-];
+const DEFAULT_FEED_URLS: &[&str] = &["https://blog.rust-lang.org/feed.xml"];
 
 /// Default SQLite database path
 const DEFAULT_DB_URL: &str = "sqlite:voca-agent.db?mode=rwc";

@@ -92,7 +92,14 @@ impl RssFetcher {
 /// Extract main text content from HTML document
 fn extract_main_content(document: &Html) -> String {
     // Try to find article or main content first
-    let selectors = ["article", "main", "[role=\"main\"]", ".content", ".post-content", "body"];
+    let selectors = [
+        "article",
+        "main",
+        "[role=\"main\"]",
+        ".content",
+        ".post-content",
+        "body",
+    ];
 
     for selector_str in selectors {
         if let Ok(selector) = Selector::parse(selector_str) {
@@ -148,10 +155,7 @@ impl FetcherPort for RssFetcher {
             .ok_or_else(|| CoreError::Parse("No items found in RSS feed".to_string()))?;
 
         // 4. Item -> Article 변환
-        let title = item
-            .title()
-            .unwrap_or("Untitled")
-            .to_string();
+        let title = item.title().unwrap_or("Untitled").to_string();
 
         let content = item
             .description()
@@ -159,10 +163,7 @@ impl FetcherPort for RssFetcher {
             .unwrap_or("")
             .to_string();
 
-        let link = item
-            .link()
-            .unwrap_or(url)
-            .to_string();
+        let link = item.link().unwrap_or(url).to_string();
 
         // pub_date를 RFC2822로 파싱
         let published_at = item
