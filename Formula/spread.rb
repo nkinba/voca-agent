@@ -1,4 +1,4 @@
-class VocaAgent < Formula
+class Spread < Formula
   desc "Headless TOEFL Vocabulary Builder for Developers"
   homepage "https://github.com/nkinba/voca-agent"
   url "https://github.com/nkinba/voca-agent/archive/refs/tags/v0.1.0.tar.gz"

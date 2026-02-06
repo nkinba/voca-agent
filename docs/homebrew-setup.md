@@ -14,11 +14,11 @@ git init
 
 # Create the Formula directory and copy the formula
 mkdir Formula
-cp /path/to/voca-agent/Formula/voca-agent.rb Formula/
+cp /path/to/voca-agent/Formula/spread.rb Formula/
 
 # Commit and push
 git add .
-git commit -m "feat: add voca-agent formula"
+git commit -m "feat: add spread formula"
 git remote add origin https://github.com/nkinba/homebrew-tap.git
 git push -u origin main
 ```
@@ -39,14 +39,14 @@ Once the tap repository is set up, users can install via:
 # Add the tap
 brew tap nkinba/tap
 
-# Install voca-agent
-brew install voca-agent
+# Install spread
+brew install spread
 ```
 
 Or in one command:
 
 ```bash
-brew install nkinba/tap/voca-agent
+brew install nkinba/tap/spread
 ```
 
 ## 4. Local Installation Test
@@ -55,13 +55,13 @@ To test the formula locally before publishing:
 
 ```bash
 # From the voca-agent repository root
-brew install --build-from-source ./Formula/voca-agent.rb
+brew install --build-from-source ./Formula/spread.rb
 
 # Verify installation
 spread --help
 
 # Uninstall if needed
-brew uninstall voca-agent
+brew uninstall spread
 ```
 
 ## 5. Updating the Formula

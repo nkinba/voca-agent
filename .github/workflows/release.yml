@@ -41,7 +41,7 @@ jobs:
       - name: Update Homebrew formula
         uses: mislav/bump-homebrew-formula-action@v3
         with:
-          formula-name: voca-agent
+          formula-name: spread
           homebrew-tap: nkinba/homebrew-tap
           download-url: https://github.com/nkinba/voca-agent/archive/refs/tags/${{ github.ref_name }}.tar.gz
         env:
