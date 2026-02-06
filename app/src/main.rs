@@ -1,6 +1,6 @@
 mod workflow;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use clap::{Parser, Subcommand};
 use tracing::{error, info, warn};
@@ -192,7 +192,7 @@ async fn run_export(obsidian_path: PathBuf) {
     export_to_obsidian(&storage, &obsidian_path).await;
 }
 
-async fn export_to_obsidian(storage: &SqliteStorage, path: &PathBuf) {
+async fn export_to_obsidian(storage: &SqliteStorage, path: &Path) {
     use voca_core::port::StoragePort;
 
     // Verify path exists
