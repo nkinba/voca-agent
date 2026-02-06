@@ -189,6 +189,22 @@ mod tests {
         async fn save_vocab(&self, _vocab: &Vocabulary) -> Result<(), CoreError> {
             Ok(())
         }
+
+        async fn get_all_vocab(&self) -> Result<Vec<Vocabulary>, CoreError> {
+            Ok(vec![])
+        }
+
+        async fn search_vocab(&self, _query: &str) -> Result<Vec<Vocabulary>, CoreError> {
+            Ok(vec![])
+        }
+
+        async fn get_today_vocab(&self) -> Result<Vec<Vocabulary>, CoreError> {
+            Ok(vec![])
+        }
+
+        async fn get_random_vocab(&self) -> Result<Option<Vocabulary>, CoreError> {
+            Ok(None)
+        }
     }
 
     struct MockLlm;
