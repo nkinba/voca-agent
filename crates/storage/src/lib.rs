@@ -112,12 +112,14 @@ impl StoragePort for SqliteStorage {
 
         Ok(rows
             .into_iter()
-            .map(|(word, definition, context_sentence, source_url)| Vocabulary {
-                word,
-                definition,
-                context_sentence,
-                source_url,
-            })
+            .map(
+                |(word, definition, context_sentence, source_url)| Vocabulary {
+                    word,
+                    definition,
+                    context_sentence,
+                    source_url,
+                },
+            )
             .collect())
     }
 
@@ -138,12 +140,14 @@ impl StoragePort for SqliteStorage {
 
         Ok(rows
             .into_iter()
-            .map(|(word, definition, context_sentence, source_url)| Vocabulary {
-                word,
-                definition,
-                context_sentence,
-                source_url,
-            })
+            .map(
+                |(word, definition, context_sentence, source_url)| Vocabulary {
+                    word,
+                    definition,
+                    context_sentence,
+                    source_url,
+                },
+            )
             .collect())
     }
 
@@ -162,12 +166,14 @@ impl StoragePort for SqliteStorage {
 
         Ok(rows
             .into_iter()
-            .map(|(word, definition, context_sentence, source_url)| Vocabulary {
-                word,
-                definition,
-                context_sentence,
-                source_url,
-            })
+            .map(
+                |(word, definition, context_sentence, source_url)| Vocabulary {
+                    word,
+                    definition,
+                    context_sentence,
+                    source_url,
+                },
+            )
             .collect())
     }
 
@@ -179,12 +185,14 @@ impl StoragePort for SqliteStorage {
         .await
         .map_err(|e| CoreError::Database(e.to_string()))?;
 
-        Ok(row.map(|(word, definition, context_sentence, source_url)| Vocabulary {
-            word,
-            definition,
-            context_sentence,
-            source_url,
-        }))
+        Ok(row.map(
+            |(word, definition, context_sentence, source_url)| Vocabulary {
+                word,
+                definition,
+                context_sentence,
+                source_url,
+            },
+        ))
     }
 }
 

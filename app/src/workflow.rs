@@ -41,7 +41,11 @@ where
             }
         };
 
-        info!(feed_url, item_count = feed_items.len(), "Fetched feed items");
+        info!(
+            feed_url,
+            item_count = feed_items.len(),
+            "Fetched feed items"
+        );
 
         for item in feed_items {
             stats.total_items += 1;

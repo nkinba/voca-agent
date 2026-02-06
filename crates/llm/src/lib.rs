@@ -101,7 +101,8 @@ impl GeminiLlmEngine {
             "both", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only",
             "own", "same", "so", "than", "too", "very", "just", "but", "and", "or", "if", "for",
             "with", "about", "against", "between", "into", "through", "during", "before", "after",
-            "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under",
+            "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over",
+            "under",
         ];
 
         words
@@ -162,7 +163,10 @@ impl LlmPort for GeminiLlmEngine {
             .map_err(|e| CoreError::Parse(format!("Failed to parse Gemini response: {}", e)))?;
 
         if let Some(error) = gemini_response.error {
-            return Err(CoreError::Llm(format!("Gemini API error: {}", error.message)));
+            return Err(CoreError::Llm(format!(
+                "Gemini API error: {}",
+                error.message
+            )));
         }
 
         let text_response = gemini_response

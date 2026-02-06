@@ -1,6 +1,6 @@
 mod workflow;
 
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use clap::{Parser, Subcommand};
 use tracing::{error, info, warn};
@@ -64,7 +64,9 @@ fn get_obsidian_path(cli_path: Option<PathBuf>) -> Option<PathBuf> {
     }
 
     // Get vault path (needed for INBOX_PATH resolution)
-    let vault_path = std::env::var(ENV_OBSIDIAN_VAULT_PATH).ok().filter(|s| !s.is_empty());
+    let vault_path = std::env::var(ENV_OBSIDIAN_VAULT_PATH)
+        .ok()
+        .filter(|s| !s.is_empty());
 
     // Try OBSIDIAN_INBOX_PATH (relative to vault)
     if let Ok(inbox_path) = std::env::var(ENV_OBSIDIAN_INBOX_PATH) {
@@ -111,7 +113,9 @@ async fn main() {
                 error!("No Obsidian path provided. Use --obsidian-path or set OBSIDIAN_VAULT_PATH/OBSIDIAN_NOTE_PATH in .env");
             }
         }
-        Some(Commands::Run { obsidian_path }) => run_pipeline(get_obsidian_path(obsidian_path)).await,
+        Some(Commands::Run { obsidian_path }) => {
+            run_pipeline(get_obsidian_path(obsidian_path)).await
+        }
         None => run_pipeline(get_obsidian_path(None)).await,
     }
 }
@@ -188,7 +192,7 @@ async fn run_export(obsidian_path: PathBuf) {
     export_to_obsidian(&storage, &obsidian_path).await;
 }
 
-async fn export_to_obsidian(storage: &SqliteStorage, path: &PathBuf) {
+async fn export_to_obsidian(storage: &SqliteStorage, path: &Path) {
     use voca_core::port::StoragePort;
 
     // Verify path exists
