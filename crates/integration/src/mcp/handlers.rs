@@ -66,9 +66,7 @@ pub async fn get_random_quiz<S: StoragePort>(
     })
 }
 
-pub async fn get_daily_words<S: StoragePort>(
-    storage: &S,
-) -> Result<Value, IntegrationError> {
+pub async fn get_daily_words<S: StoragePort>(storage: &S) -> Result<Value, IntegrationError> {
     let vocabs = storage.get_today_vocab().await?;
 
     let text = if vocabs.is_empty() {
@@ -151,9 +149,14 @@ mod tests {
             }],
         };
 
-        let result = search_voca(&storage, SearchVocaArgs { query: "serendip".to_string() })
-            .await
-            .unwrap();
+        let result = search_voca(
+            &storage,
+            SearchVocaArgs {
+                query: "serendip".to_string(),
+            },
+        )
+        .await
+        .unwrap();
 
         assert!(result.content[0].text.contains("serendipity"));
     }
@@ -162,9 +165,14 @@ mod tests {
     async fn test_search_voca_no_results() {
         let storage = MockStorage { vocabs: vec![] };
 
-        let result = search_voca(&storage, SearchVocaArgs { query: "xyz".to_string() })
-            .await
-            .unwrap();
+        let result = search_voca(
+            &storage,
+            SearchVocaArgs {
+                query: "xyz".to_string(),
+            },
+        )
+        .await
+        .unwrap();
 
         assert!(result.content[0].text.contains("No vocabulary found"));
     }

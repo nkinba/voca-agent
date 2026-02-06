@@ -7,9 +7,9 @@ use crate::error::IntegrationError;
 
 use super::handlers::{get_daily_words, get_random_quiz, search_voca, SearchVocaArgs};
 use super::protocol::{
-    InitializeResult, JsonRpcRequest, JsonRpcResponse, Resource, ResourcesListResult,
-    ServerCapabilities, ServerInfo, Tool, ToolCallParams, ToolsCapability, ToolsListResult,
-    ResourcesCapability, INTERNAL_ERROR, INVALID_PARAMS, METHOD_NOT_FOUND, PARSE_ERROR,
+    InitializeResult, JsonRpcRequest, JsonRpcResponse, Resource, ResourcesCapability,
+    ResourcesListResult, ServerCapabilities, ServerInfo, Tool, ToolCallParams, ToolsCapability,
+    ToolsListResult, INTERNAL_ERROR, INVALID_PARAMS, METHOD_NOT_FOUND, PARSE_ERROR,
 };
 
 const PROTOCOL_VERSION: &str = "2024-11-05";
@@ -75,7 +75,11 @@ impl<S: StoragePort> McpServer<S> {
             "resources/read" => self.handle_resources_read(id, request.params).await,
             method => {
                 error!(method = %method, "Unknown method");
-                JsonRpcResponse::error(id, METHOD_NOT_FOUND, &format!("Method not found: {}", method))
+                JsonRpcResponse::error(
+                    id,
+                    METHOD_NOT_FOUND,
+                    &format!("Method not found: {}", method),
+                )
             }
         }
     }
@@ -84,7 +88,9 @@ impl<S: StoragePort> McpServer<S> {
         let result = InitializeResult {
             protocol_version: PROTOCOL_VERSION.to_string(),
             capabilities: ServerCapabilities {
-                tools: Some(ToolsCapability { list_changed: Some(false) }),
+                tools: Some(ToolsCapability {
+                    list_changed: Some(false),
+                }),
                 resources: Some(ResourcesCapability {
                     list_changed: Some(false),
                     subscribe: Some(false),
@@ -165,7 +171,9 @@ impl<S: StoragePort> McpServer<S> {
                 };
 
                 match search_voca(&self.storage, args).await {
-                    Ok(result) => JsonRpcResponse::success(id, serde_json::to_value(result).unwrap()),
+                    Ok(result) => {
+                        JsonRpcResponse::success(id, serde_json::to_value(result).unwrap())
+                    }
                     Err(e) => {
                         JsonRpcResponse::error(id, INTERNAL_ERROR, &format!("Search failed: {}", e))
                     }
@@ -177,7 +185,9 @@ impl<S: StoragePort> McpServer<S> {
                     JsonRpcResponse::error(id, INTERNAL_ERROR, &format!("Quiz failed: {}", e))
                 }
             },
-            tool => JsonRpcResponse::error(id, METHOD_NOT_FOUND, &format!("Unknown tool: {}", tool)),
+            tool => {
+                JsonRpcResponse::error(id, METHOD_NOT_FOUND, &format!("Unknown tool: {}", tool))
+            }
         }
     }
 
