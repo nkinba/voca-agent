@@ -74,10 +74,7 @@ impl TelegramClient {
 
     /// Send a message via Telegram Bot API
     pub async fn send_message(&self, text: &str) -> Result<(), NotifyError> {
-        let url = format!(
-            "{}/bot{}/sendMessage",
-            TELEGRAM_API_BASE, self.bot_token
-        );
+        let url = format!("{}/bot{}/sendMessage", TELEGRAM_API_BASE, self.bot_token);
 
         let request = SendMessageRequest {
             chat_id: &self.chat_id,
@@ -85,12 +82,7 @@ impl TelegramClient {
             parse_mode: "MarkdownV2",
         };
 
-        let response = self
-            .client
-            .post(&url)
-            .json(&request)
-            .send()
-            .await?;
+        let response = self.client.post(&url).json(&request).send().await?;
 
         let telegram_response: TelegramResponse = response.json().await?;
 
@@ -150,9 +142,7 @@ impl Notifier {
         let count = self.word_count.min(vocabularies.len());
         let mut rng = rand::thread_rng();
 
-        vocabularies
-            .choose_multiple(&mut rng, count)
-            .collect()
+        vocabularies.choose_multiple(&mut rng, count).collect()
     }
 
     /// Format vocabularies into a Telegram message

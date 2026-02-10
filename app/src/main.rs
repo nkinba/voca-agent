@@ -315,7 +315,10 @@ async fn run_notify(use_all: bool, test_mode: bool) {
             if result.skipped {
                 warn!("Notification skipped (no words)");
             } else {
-                info!(words_sent = result.words_sent, "Notification sent successfully");
+                info!(
+                    words_sent = result.words_sent,
+                    "Notification sent successfully"
+                );
             }
         }
         Err(e) => {
