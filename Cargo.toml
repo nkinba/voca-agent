@@ -38,4 +38,5 @@ voca-core = { path = "crates/core" }
 voca-fetcher = { path = "crates/fetcher" }
 voca-integration = { path = "crates/integration" }
 voca-llm = { path = "crates/llm" }
+voca-notify = { path = "crates/notify" }
 voca-storage = { path = "crates/storage" }

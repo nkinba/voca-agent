@@ -7,6 +7,7 @@ edition = "2021"
 voca-core = { workspace = true }
 voca-fetcher = { workspace = true }
 voca-integration = { workspace = true }
+voca-notify = { workspace = true }
 voca-storage = { workspace = true }
 voca-llm = { workspace = true }
 
