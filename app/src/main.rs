@@ -9,6 +9,7 @@ use tracing_subscriber::EnvFilter;
 use voca_fetcher::RssFetcher;
 use voca_integration::{MarkdownExporter, McpServer};
 use voca_llm::MockLlmEngine;
+use voca_notify::Notifier;
 use voca_storage::SqliteStorage;
 
 /// Default RSS feed URLs for testing
@@ -45,6 +46,15 @@ enum Commands {
         /// Obsidian vault path (overrides OBSIDIAN_VAULT_PATH env)
         #[arg(long)]
         obsidian_path: Option<PathBuf>,
+    },
+    /// Send daily vocabulary notification via Telegram
+    Notify {
+        /// Send all vocabulary instead of just today's
+        #[arg(long)]
+        all: bool,
+        /// Test mode: use all vocabulary if today's is empty
+        #[arg(long)]
+        test: bool,
     },
 }
 
@@ -116,6 +126,7 @@ async fn main() {
         Some(Commands::Run { obsidian_path }) => {
             run_pipeline(get_obsidian_path(obsidian_path)).await
         }
+        Some(Commands::Notify { all, test }) => run_notify(all, test).await,
         None => run_pipeline(get_obsidian_path(None)).await,
     }
 }
@@ -233,6 +244,82 @@ async fn export_to_obsidian(storage: &SqliteStorage, path: &Path) {
         }
         Err(e) => {
             error!(error = %e, "Failed to export vocabulary");
+        }
+    }
+}
+
+async fn run_notify(use_all: bool, test_mode: bool) {
+    use voca_core::port::StoragePort;
+
+    info!("Starting Telegram notification");
+
+    // Check for Telegram configuration
+    let notifier = match Notifier::from_env() {
+        Some(n) => n,
+        None => {
+            warn!("Telegram not configured. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env");
+            return;
+        }
+    };
+
+    let storage = match SqliteStorage::new(DEFAULT_DB_URL).await {
+        Ok(s) => s,
+        Err(e) => {
+            error!(error = %e, "Failed to initialize storage");
+            return;
+        }
+    };
+
+    // Get vocabulary based on mode
+    let vocabs = if use_all {
+        info!("Using all vocabulary");
+        match storage.get_all_vocab().await {
+            Ok(v) => v,
+            Err(e) => {
+                error!(error = %e, "Failed to get vocabulary");
+                return;
+            }
+        }
+    } else {
+        info!("Using today's vocabulary");
+        let today = match storage.get_today_vocab().await {
+            Ok(v) => v,
+            Err(e) => {
+                error!(error = %e, "Failed to get today's vocabulary");
+                return;
+            }
+        };
+
+        // In test mode, fall back to all vocabulary if today's is empty
+        if today.is_empty() && test_mode {
+            info!("No vocabulary for today, using all vocabulary (test mode)");
+            match storage.get_all_vocab().await {
+                Ok(v) => v,
+                Err(e) => {
+                    error!(error = %e, "Failed to get vocabulary");
+                    return;
+                }
+            }
+        } else {
+            today
+        }
+    };
+
+    if vocabs.is_empty() {
+        warn!("No vocabulary available to send");
+        return;
+    }
+
+    match notifier.notify(&vocabs).await {
+        Ok(result) => {
+            if result.skipped {
+                warn!("Notification skipped (no words)");
+            } else {
+                info!(words_sent = result.words_sent, "Notification sent successfully");
+            }
+        }
+        Err(e) => {
+            error!(error = %e, "Failed to send notification");
         }
     }
 }
