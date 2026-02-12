@@ -38,8 +38,7 @@ impl RssFetcher {
             .await
             .map_err(|e| CoreError::Network(e.to_string()))?;
 
-        let feed = parser::parse(bytes.as_ref())
-            .map_err(|e| CoreError::Parse(e.to_string()))?;
+        let feed = parser::parse(bytes.as_ref()).map_err(|e| CoreError::Parse(e.to_string()))?;
 
         let items: Vec<FeedItem> = feed
             .entries
@@ -51,10 +50,7 @@ impl RssFetcher {
                     .as_ref()
                     .map(|t| t.content.clone())
                     .unwrap_or_else(|| "Untitled".to_string());
-                let published_at = entry
-                    .published
-                    .or(entry.updated)
-                    .unwrap_or_else(Utc::now);
+                let published_at = entry.published.or(entry.updated).unwrap_or_else(Utc::now);
 
                 Some(FeedItem {
                     url,
@@ -147,8 +143,7 @@ impl FetcherPort for RssFetcher {
             .map_err(|e| CoreError::Network(e.to_string()))?;
 
         // 2. feed-rs로 파싱 (RSS, Atom, JSON Feed 자동 감지)
-        let feed = parser::parse(bytes.as_ref())
-            .map_err(|e| CoreError::Parse(e.to_string()))?;
+        let feed = parser::parse(bytes.as_ref()).map_err(|e| CoreError::Parse(e.to_string()))?;
 
         // 3. 가장 최신 Item 하나 추출
         let entry = feed
@@ -176,10 +171,7 @@ impl FetcherPort for RssFetcher {
             .map(|l| l.href.clone())
             .unwrap_or_else(|| url.to_string());
 
-        let published_at = entry
-            .published
-            .or(entry.updated)
-            .unwrap_or_else(Utc::now);
+        let published_at = entry.published.or(entry.updated).unwrap_or_else(Utc::now);
 
         let collected_at = Utc::now();
 
