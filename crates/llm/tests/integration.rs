@@ -1,10 +1,10 @@
-//! Integration tests for voca-llm
+//! Integration tests for spread-llm
 //!
 //! These tests require a valid GEMINI_API_KEY environment variable.
-//! Run with: cargo test --package voca-llm --test integration -- --ignored
+//! Run with: cargo test --package spread-llm --test integration -- --ignored
 
-use voca_core::LlmPort;
-use voca_llm::GeminiLlmEngine;
+use spread_core::LlmPort;
+use spread_llm::GeminiLlmEngine;
 
 const SAMPLE_TEXT: &str = r#"
 The phenomenon of cognitive dissonance, first articulated by Leon Festinger in 1957,

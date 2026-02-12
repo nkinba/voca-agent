@@ -1,4 +1,4 @@
-# Spread (Voca-Agent)
+# Spread
 
 RSS 피드와 기술 블로그를 모니터링하여 TOEFL 수준의 영어 어휘를 추출하는 헤드리스 AI 에이전트입니다.
 
@@ -21,7 +21,7 @@ RSS 피드와 기술 블로그를 모니터링하여 TOEFL 수준의 영어 어�
 ## 프로젝트 구조
 
 ```
-voca-agent/
+spread/
 ├── Cargo.toml              # Workspace 설정
 ├── Formula/                # Homebrew Formula
 │   └── spread.rb
@@ -62,12 +62,12 @@ voca-agent/
 
 | 모듈 | PRD | 상태 |
 |------|-----|------|
-| voca-core | PRD-001 | ✅ 완료 |
-| voca-fetcher | PRD-002 | ✅ 완료 |
-| voca-storage | PRD-003 | ✅ 완료 |
-| voca-llm | PRD-004 | ✅ 완료 |
+| spread-core | PRD-001 | ✅ 완료 |
+| spread-fetcher | PRD-002 | ✅ 완료 |
+| spread-storage | PRD-003 | ✅ 완료 |
+| spread-llm | PRD-004 | ✅ 완료 |
 | Pipeline | PRD-005 | ✅ 완료 |
-| voca-integration | PRD-006 | ✅ 완료 |
+| spread-integration | PRD-006 | ✅ 완료 |
 | CI/CD | PRD-007 | ✅ 완료 |
 | Homebrew 배포 | PRD-008 | ✅ 완료 |
 | Telegram 알림 | PRD-009 | ✅ 완료 |
@@ -87,8 +87,8 @@ brew tap nkinba/tap
 brew install spread
 
 # 또는 소스에서 빌드
-git clone https://github.com/nkinba/voca-agent.git
-cd voca-agent
+git clone https://github.com/nkinba/spread.git
+cd spread
 cargo build --release
 
 # pre-commit hook 설치 (개발 시 필수)
@@ -164,7 +164,7 @@ spread notify --test    # 테스트 모드
 # 로그 레벨 설정 (RUST_LOG 환경변수)
 RUST_LOG=info cargo run
 RUST_LOG=debug cargo run
-RUST_LOG=voca_fetcher=debug cargo run
+RUST_LOG=spread_fetcher=debug cargo run
 ```
 
 ## 테스트
@@ -179,22 +179,22 @@ cargo test
 
 ```bash
 # core 모듈 테스트
-cargo test -p voca-core
+cargo test -p spread-core
 
 # fetcher 모듈 테스트
-cargo test -p voca-fetcher
+cargo test -p spread-fetcher
 
 # storage 모듈 테스트
-cargo test -p voca-storage
+cargo test -p spread-storage
 
 # llm 모듈 테스트
-cargo test -p voca-llm
+cargo test -p spread-llm
 
 # notify 모듈 테스트
-cargo test -p voca-notify
+cargo test -p spread-notify
 
 # integration 모듈 테스트
-cargo test -p voca-integration
+cargo test -p spread-integration
 ```
 
 ### 테스트 출력 표시
@@ -210,13 +210,13 @@ cargo test test_article_crud
 
 ### 현재 테스트 커버리지
 
-**voca-fetcher** (4개 테스트)
+**spread-fetcher** (4개 테스트)
 - `test_parse_rss_channel`: RSS 채널 파싱 검증
 - `test_parse_empty_rss`: 빈 피드 처리
 - `test_parse_invalid_xml`: 잘못된 XML 에러 처리
 - `test_rfc2822_date_parsing`: 날짜 파싱 검증
 
-**voca-storage** (3개 테스트)
+**spread-storage** (3개 테스트)
 - `test_article_crud`: Article 저장 및 조회
 - `test_vocabulary_crud`: Vocabulary 저장
 - `test_duplicate_article_ignored`: 중복 Article 무시 (INSERT OR IGNORE)
@@ -243,8 +243,8 @@ SELECT * FROM vocabularies;
 **SqliteStorage 사용 예시** (Rust 코드):
 
 ```rust
-use voca_storage::SqliteStorage;
-use voca_core::{Article, Vocabulary, SourceType, StoragePort};
+use spread_storage::SqliteStorage;
+use spread_core::{Article, Vocabulary, SourceType, StoragePort};
 use chrono::Utc;
 
 #[tokio::main]

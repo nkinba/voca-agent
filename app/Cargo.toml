@@ -4,12 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-voca-core = { workspace = true }
-voca-fetcher = { workspace = true }
-voca-integration = { workspace = true }
-voca-notify = { workspace = true }
-voca-storage = { workspace = true }
-voca-llm = { workspace = true }
+spread-core = { workspace = true }
+spread-fetcher = { workspace = true }
+spread-integration = { workspace = true }
+spread-notify = { workspace = true }
+spread-storage = { workspace = true }
+spread-llm = { workspace = true }
 
 tokio = { workspace = true }
 tracing = { workspace = true }

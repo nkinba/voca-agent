@@ -1,11 +1,11 @@
 [package]
-name = "voca-notify"
+name = "spread-notify"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-voca-core = { workspace = true }
-voca-storage = { workspace = true }
+spread-core = { workspace = true }
+spread-storage = { workspace = true }
 
 reqwest = { workspace = true }
 serde = { workspace = true }

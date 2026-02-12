@@ -1,8 +1,8 @@
 use rand::seq::SliceRandom;
 use serde::Serialize;
+use spread_core::model::Vocabulary;
 use thiserror::Error;
 use tracing::{info, warn};
-use voca_core::model::Vocabulary;
 
 /// Number of words to select for daily notification
 const DEFAULT_WORD_COUNT: usize = 3;

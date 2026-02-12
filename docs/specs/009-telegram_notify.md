@@ -3,11 +3,11 @@
 ## 1. Goal
 - 수집된 단어 중 '오늘의 단어' 3개를 선정하여 사용자의 텔레그램으로 발송한다.
 - 사용자가 앱을 켜지 않아도 학습이 이루어지게 한다 (Zero-Friction).
-- 패키지명: `voca-notify`
+- 패키지명: `spread-notify`
 
 ## 2. Dependencies (`crates/notify/Cargo.toml`)
-- `voca-core`: { path = "../core" }
-- `voca-storage`: { path = "../storage" }
+- `spread-core`: { path = "../core" }
+- `spread-storage`: { path = "../storage" }
 - `reqwest`: { workspace = true } (HTTP 요청용)
 - `serde`: { workspace = true }
 - `serde_json`: { workspace = true }
@@ -38,7 +38,7 @@
 
 ## 4. Execution Flow
 - `app`의 스케줄러(Cron)가 매일 아침 8시에 `Notifier::run()`을 호출하도록 설정.
-- 또는 CLI 명령어로 테스트: `voca-agent notify --test`
+- 또는 CLI 명령어로 테스트: `spread notify --test`
 
 ## 5. Agent Instruction
 - `crates/notify` 모듈을 생성한다.

@@ -1,9 +1,9 @@
 use std::path::{Path, PathBuf};
 
 use chrono::Local;
+use spread_core::model::Vocabulary;
 use tera::{Context, Tera};
 use tracing::info;
-use voca_core::model::Vocabulary;
 
 use crate::error::IntegrationError;
 

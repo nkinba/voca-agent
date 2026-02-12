@@ -1,4 +1,4 @@
-use voca_core::error::CoreError;
+use spread_core::error::CoreError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum IntegrationError {

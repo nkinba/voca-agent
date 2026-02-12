@@ -49,7 +49,7 @@ spread mcp   # stdio 모드로 MCP 서버 시작
 ```json
 {
   "mcpServers": {
-    "voca-agent": {
+    "spread": {
       "command": "spread",
       "args": ["mcp"]
     }

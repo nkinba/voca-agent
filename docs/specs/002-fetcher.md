@@ -1,12 +1,12 @@
 # Micro-PRD: RSS Fetcher Module
 
 ## 1. Goal
-- `voca-core`에 정의된 `FetcherPort` 트레이트를 구현하는 구체적인 로직을 작성한다.
+- `spread-core`에 정의된 `FetcherPort` 트레이트를 구현하는 구체적인 로직을 작성한다.
 - 지정된 RSS URL에서 데이터를 가져와 `Article` 도메인 모델로 변환한다.
-- 패키지명: `voca-fetcher`
+- 패키지명: `spread-fetcher`
 
 ## 2. Dependencies (`crates/fetcher/Cargo.toml`)
-- `voca-core`: { path = "../core" }
+- `spread-core`: { path = "../core" }
 - `reqwest`: { version = "0.11", features = ["json", "rustls-tls"] }
 - `rss`: "2.0"
 - `async-trait`: "0.1" (Trait 구현용)
@@ -48,4 +48,4 @@ impl FetcherPort for RssFetcher {
 ### 5. Agent Instruction
 1. Cargo.toml 의존성을 설정한다.
 2. src/lib.rs에 RssFetcher 구조체를 만들고 FetcherPort를 구현한다.
-3. voca-core의 타입을 사용해야 하므로 use voca_core::model::*; 등을 적절히 활용한다.
+3. spread-core의 타입을 사용해야 하므로 use spread_core::model::*; 등을 적절히 활용한다.
