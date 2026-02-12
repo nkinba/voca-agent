@@ -1,12 +1,14 @@
-# Voca-Agent
+# Spread (Voca-Agent)
 
 RSS 피드와 기술 블로그를 모니터링하여 TOEFL 수준의 영어 어휘를 추출하는 헤드리스 AI 에이전트입니다.
 
 ## 프로젝트 개요
 
 - **RSS/웹 크롤링**: 기술 블로그 및 뉴스 피드 자동 수집
-- **LLM 기반 어휘 추출**: Gemini 1.5 Flash를 활용한 문맥 기반 어휘 분석
-- **Obsidian 연동**: MCP 서버를 통한 Obsidian Vault 동기화 (예정)
+- **LLM 기반 어휘 추출**: Gemini 2.5 Flash를 활용한 문맥 기반 어휘 분석
+- **Obsidian 연동**: MCP 서버를 통한 Obsidian Vault 동기화
+- **Telegram 알림**: 일일 어휘 알림 발송
+- **Homebrew 배포**: macOS용 Homebrew Tap 지원
 
 ## 기술 스택
 
@@ -21,8 +23,12 @@ RSS 피드와 기술 블로그를 모니터링하여 TOEFL 수준의 영어 어�
 ```
 voca-agent/
 ├── Cargo.toml              # Workspace 설정
+├── Formula/                # Homebrew Formula
+│   └── spread.rb
 ├── app/                    # 메인 바이너리 (Orchestrator)
-│   └── src/main.rs
+│   └── src/
+│       ├── main.rs         # CLI 엔트리포인트
+│       └── workflow.rs     # 파이프라인 워크플로우
 ├── crates/
 │   ├── core/               # 도메인 모델 및 인터페이스 (Ports)
 │   │   └── src/
@@ -32,12 +38,24 @@ voca-agent/
 │   │       └── error.rs    # CoreError
 │   ├── fetcher/            # RSS 수집 모듈
 │   │   └── src/lib.rs      # RssFetcher
-│   └── storage/            # SQLite 저장소 모듈
-│       └── src/lib.rs      # SqliteStorage
+│   ├── storage/            # SQLite 저장소 모듈
+│   │   └── src/lib.rs      # SqliteStorage
+│   ├── llm/                # LLM 연동 모듈
+│   │   └── src/lib.rs      # GeminiLlmEngine, MockLlmEngine
+│   ├── integration/        # 외부 연동 모듈
+│   │   └── src/
+│   │       ├── mcp/        # MCP 서버
+│   │       └── obsidian/   # Obsidian 내보내기
+│   └── notify/             # 알림 모듈
+│       └── src/lib.rs      # TelegramClient, Notifier
+├── .github/
+│   └── workflows/
+│       ├── ci.yml          # CI 파이프라인
+│       └── release.yml     # 릴리스 자동화
 └── docs/                   # 문서
     ├── master-prd.md       # 마스터 PRD
     ├── adrs/               # Architecture Decision Records
-    └── specs/              # 모듈별 상세 스펙 (PRD-001 ~ 005)
+    └── specs/              # 모듈별 상세 스펙 (PRD-001 ~ 009)
 ```
 
 ## 개발 현황
@@ -47,8 +65,12 @@ voca-agent/
 | voca-core | PRD-001 | ✅ 완료 |
 | voca-fetcher | PRD-002 | ✅ 완료 |
 | voca-storage | PRD-003 | ✅ 완료 |
-| voca-llm | PRD-004 | ⬜ 예정 |
-| Pipeline | PRD-005 | ⬜ 예정 |
+| voca-llm | PRD-004 | ✅ 완료 |
+| Pipeline | PRD-005 | ✅ 완료 |
+| voca-integration | PRD-006 | ✅ 완료 |
+| CI/CD | PRD-007 | ✅ 완료 |
+| Homebrew 배포 | PRD-008 | ✅ 완료 |
+| Telegram 알림 | PRD-009 | ✅ 완료 |
 
 ## 환경 설정
 
@@ -60,13 +82,50 @@ voca-agent/
 ### 설치
 
 ```bash
-# Rust 설치 (이미 설치된 경우 생략)
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+# Homebrew를 통한 설치 (macOS)
+brew tap nkinba/tap
+brew install spread
 
-# 프로젝트 클론
+# 또는 소스에서 빌드
 git clone https://github.com/nkinba/voca-agent.git
 cd voca-agent
+cargo build --release
 ```
+
+### 환경 변수 설정
+
+`.env` 파일을 프로젝트 루트에 생성하거나 환경 변수를 직접 설정합니다.
+
+```bash
+# .env 파일 예시
+
+# [필수] Gemini API 키 (LLM 어휘 추출에 사용)
+GEMINI_API_KEY=your_gemini_api_key
+
+# [선택] Obsidian 연동
+OBSIDIAN_VAULT_PATH=/path/to/your/vault
+OBSIDIAN_NOTE_PATH=/path/to/your/vault/vocabulary.md
+OBSIDIAN_INBOX_PATH=Inbox  # VAULT_PATH 기준 상대 경로
+
+# [선택] Telegram 알림
+TELEGRAM_BOT_TOKEN=your_bot_token
+TELEGRAM_CHAT_ID=your_chat_id
+```
+
+### 외부 API 키 발급
+
+#### Gemini API Key
+
+1. [Google AI Studio](https://aistudio.google.com/apikey)에서 API 키 발급
+2. `GEMINI_API_KEY` 환경 변수에 설정
+
+#### Telegram Bot Token
+
+1. Telegram에서 [@BotFather](https://t.me/BotFather)와 대화
+2. `/newbot` 명령으로 봇 생성
+3. 발급된 토큰을 `TELEGRAM_BOT_TOKEN`에 설정
+4. 봇과 대화 시작 후 [getUpdates API](https://api.telegram.org/bot<TOKEN>/getUpdates)로 `chat_id` 확인
+5. `TELEGRAM_CHAT_ID`에 설정
 
 ## 빌드 및 실행
 
@@ -83,8 +142,21 @@ cargo build --release
 ### 실행
 
 ```bash
-# 개발 모드 실행
+# 어휘 수집 파이프라인 실행 (기본)
 cargo run
+# 또는
+spread run
+
+# MCP 서버 모드 (Obsidian 연동)
+spread mcp
+
+# Obsidian으로 어휘 내보내기
+spread export --obsidian-path /path/to/vault
+
+# Telegram 알림 발송
+spread notify           # 오늘의 어휘
+spread notify --all     # 전체 어휘
+spread notify --test    # 테스트 모드
 
 # 로그 레벨 설정 (RUST_LOG 환경변수)
 RUST_LOG=info cargo run
@@ -111,6 +183,15 @@ cargo test -p voca-fetcher
 
 # storage 모듈 테스트
 cargo test -p voca-storage
+
+# llm 모듈 테스트
+cargo test -p voca-llm
+
+# notify 모듈 테스트
+cargo test -p voca-notify
+
+# integration 모듈 테스트
+cargo test -p voca-integration
 ```
 
 ### 테스트 출력 표시
@@ -286,6 +367,33 @@ CREATE TABLE vocabularies (
 );
 ```
 
+## GitHub Actions 설정
+
+CI/CD 파이프라인 실행을 위해 다음 시크릿을 GitHub 저장소 설정에 추가해야 합니다.
+
+### Repository Secrets 설정
+
+**Settings > Secrets and variables > Actions > Repository secrets**
+
+| Secret 이름 | 용도 | 필수 |
+|------------|------|------|
+| `GEMINI_API_KEY` | CI 테스트 실행 시 LLM 통합 테스트 | 선택 |
+| `HOMEBREW_TAP_TOKEN` | 릴리스 시 Homebrew Tap 자동 업데이트 | 선택 |
+
+### CI 워크플로우 (`.github/workflows/ci.yml`)
+
+- main 브랜치 push/PR 시 자동 실행
+- 포맷 검사 (`cargo fmt`)
+- 린트 검사 (`cargo clippy`)
+- 테스트 실행 (`cargo test`)
+
+### Release 워크플로우 (`.github/workflows/release.yml`)
+
+- `v*` 태그 push 시 자동 실행
+- 릴리스 바이너리 빌드
+- GitHub Release 생성
+- Homebrew Tap 자동 업데이트 (HOMEBREW_TAP_TOKEN 필요)
+
 ## 문서
 
 - [Master PRD](docs/master-prd.md) - 전체 프로젝트 요구사항
@@ -296,6 +404,10 @@ CREATE TABLE vocabularies (
 - [PRD-003 Storage](docs/specs/003-storage.md) - 저장소 모듈 스펙
 - [PRD-004 LLM](docs/specs/004-llm.md) - LLM 연동 스펙
 - [PRD-005 Pipeline](docs/specs/005-pipeline.md) - 파이프라인 오케스트레이션 스펙
+- [PRD-006 Integration](docs/specs/006-integration.md) - 외부 연동 스펙
+- [PRD-007 CI/CD](docs/specs/007-cicd.md) - CI/CD 스펙
+- [PRD-008 Homebrew](docs/specs/008-homebrew_dist.md) - Homebrew 배포 스펙
+- [PRD-009 Telegram](docs/specs/009-telegram_notify.md) - Telegram 알림 스펙
 
 ## 라이선스
 
