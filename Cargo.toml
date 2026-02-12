@@ -34,9 +34,9 @@ serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
 # Internal crates
-voca-core = { path = "crates/core" }
-voca-fetcher = { path = "crates/fetcher" }
-voca-integration = { path = "crates/integration" }
-voca-llm = { path = "crates/llm" }
-voca-notify = { path = "crates/notify" }
-voca-storage = { path = "crates/storage" }
+spread-core = { path = "crates/core" }
+spread-fetcher = { path = "crates/fetcher" }
+spread-integration = { path = "crates/integration" }
+spread-llm = { path = "crates/llm" }
+spread-notify = { path = "crates/notify" }
+spread-storage = { path = "crates/storage" }

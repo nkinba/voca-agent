@@ -3,7 +3,7 @@ use chrono::{DateTime, Utc};
 use feed_rs::parser;
 use scraper::{Html, Selector};
 
-use voca_core::{Article, CoreError, FetcherPort, SourceType};
+use spread_core::{Article, CoreError, FetcherPort, SourceType};
 
 /// Feed item metadata (URL and title)
 #[derive(Debug, Clone)]

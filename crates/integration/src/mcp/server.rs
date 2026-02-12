@@ -1,7 +1,7 @@
 use serde_json::{json, Value};
+use spread_core::port::StoragePort;
 use std::io::{BufRead, Write};
 use tracing::{debug, error, info};
-use voca_core::port::StoragePort;
 
 use crate::error::IntegrationError;
 
@@ -13,7 +13,7 @@ use super::protocol::{
 };
 
 const PROTOCOL_VERSION: &str = "2024-11-05";
-const SERVER_NAME: &str = "voca-agent";
+const SERVER_NAME: &str = "spread";
 const SERVER_VERSION: &str = "0.1.0";
 
 pub struct McpServer<S: StoragePort> {

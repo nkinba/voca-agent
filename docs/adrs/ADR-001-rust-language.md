@@ -1,7 +1,7 @@
 ## ADR-001: 핵심 프로그래밍 언어로 Rust 선정
 
 ### 1. Context
-- `voca-agent`는 24시간 백그라운드에서 실행되는 Headless 에이전트임.
+- `spread`는 24시간 백그라운드에서 실행되는 Headless 에이전트임.
 - 시스템 리소스(CPU/Mem) 효율성이 중요하며, 동시성 처리(크롤링)가 필수적임.
 ### 2. Decision
 - **Rust**를 주 언어로 채택한다.

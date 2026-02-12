@@ -3,8 +3,8 @@ use std::time::Duration;
 use tokio::time::sleep;
 use tracing::{error, info, warn};
 
-use voca_core::{Article, LlmPort, SourceType, StoragePort, Vocabulary};
-use voca_fetcher::RssFetcher;
+use spread_core::{Article, LlmPort, SourceType, StoragePort, Vocabulary};
+use spread_fetcher::RssFetcher;
 
 /// Rate limiting delay between LLM API calls (in seconds)
 const LLM_RATE_LIMIT_DELAY_SECS: u64 = 2;
@@ -170,7 +170,7 @@ pub enum PipelineError {
 mod tests {
     use super::*;
     use async_trait::async_trait;
-    use voca_core::CoreError;
+    use spread_core::CoreError;
 
     struct MockStorage {
         existing_urls: Vec<String>,

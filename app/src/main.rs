@@ -6,17 +6,17 @@ use clap::{Parser, Subcommand};
 use tracing::{error, info, warn};
 use tracing_subscriber::EnvFilter;
 
-use voca_fetcher::RssFetcher;
-use voca_integration::{MarkdownExporter, McpServer};
-use voca_llm::MockLlmEngine;
-use voca_notify::Notifier;
-use voca_storage::SqliteStorage;
+use spread_fetcher::RssFetcher;
+use spread_integration::{MarkdownExporter, McpServer};
+use spread_llm::MockLlmEngine;
+use spread_notify::Notifier;
+use spread_storage::SqliteStorage;
 
 /// Default RSS feed URLs for testing
 const DEFAULT_FEED_URLS: &[&str] = &["https://blog.rust-lang.org/feed.xml"];
 
 /// Default SQLite database path
-const DEFAULT_DB_URL: &str = "sqlite:voca-agent.db?mode=rwc";
+const DEFAULT_DB_URL: &str = "sqlite:spread.db?mode=rwc";
 
 /// Environment variable names
 const ENV_OBSIDIAN_VAULT_PATH: &str = "OBSIDIAN_VAULT_PATH";
@@ -24,7 +24,7 @@ const ENV_OBSIDIAN_NOTE_PATH: &str = "OBSIDIAN_NOTE_PATH";
 const ENV_OBSIDIAN_INBOX_PATH: &str = "OBSIDIAN_INBOX_PATH";
 
 #[derive(Parser)]
-#[command(name = "voca-agent")]
+#[command(name = "spread")]
 #[command(about = "Vocabulary collection agent with Obsidian and MCP integration")]
 struct Cli {
     #[command(subcommand)]
@@ -132,7 +132,7 @@ async fn main() {
 }
 
 async fn run_pipeline(obsidian_path: Option<PathBuf>) {
-    info!("Starting voca-agent pipeline");
+    info!("Starting spread pipeline");
 
     // Initialize dependencies
     let fetcher = RssFetcher::new();
@@ -204,7 +204,7 @@ async fn run_export(obsidian_path: PathBuf) {
 }
 
 async fn export_to_obsidian(storage: &SqliteStorage, path: &Path) {
-    use voca_core::port::StoragePort;
+    use spread_core::port::StoragePort;
 
     // Verify path exists
     if !path.exists() {
@@ -249,7 +249,7 @@ async fn export_to_obsidian(storage: &SqliteStorage, path: &Path) {
 }
 
 async fn run_notify(use_all: bool, test_mode: bool) {
-    use voca_core::port::StoragePort;
+    use spread_core::port::StoragePort;
 
     info!("Starting Telegram notification");
 

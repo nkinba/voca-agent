@@ -65,7 +65,7 @@ source: https://blog.rust-lang.org/2024/01/ownership
       "tools": {"listChanged": false}
     },
     "protocolVersion": "2024-11-05",
-    "serverInfo": {"name": "voca-agent", "version": "0.1.0"}
+    "serverInfo": {"name": "spread", "version": "0.1.0"}
   }
 }
 ```

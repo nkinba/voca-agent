@@ -1,9 +1,9 @@
 # Micro-PRD: Core Domain Layer
 
 ## 1. Goal
-- 프로젝트(`voca-agent`) 전체에서 사용할 공통 데이터 모델(Struct)과 추상 인터페이스(Trait)를 정의한다.
+- 프로젝트(`spread`) 전체에서 사용할 공통 데이터 모델(Struct)과 추상 인터페이스(Trait)를 정의한다.
 - 이 모듈은 외부 의존성을 최소화하고, 순수 비즈니스 로직의 타입을 제공해야 한다.
-- `crates/core` 내부에 구현하며, 패키지명은 `voca-core`로 한다.
+- `crates/core` 내부에 구현하며, 패키지명은 `spread-core`로 한다.
 
 ## 2. Dependencies
 - `serde`: 데이터 직렬화/역직렬화 (features = ["derive"])
@@ -77,7 +77,7 @@ pub enum CoreError {
 ```
 
 ### 6. Implementation Steps (Agent Instruction)
-1. crates/core/Cargo.toml을 수정하여 패키지명을 voca-core로 설정하고, 위 의존성을 추가한다.
+1. crates/core/Cargo.toml을 수정하여 패키지명을 spread-core로 설정하고, 위 의존성을 추가한다.
 2. src/error.rs, src/model.rs, src/port.rs 파일을 각각 생성한다.
 3. src/lib.rs에서 위 모듈들을 pub mod로 공개(Re-export)한다.
 4. 구현체(impl)는 작성하지 않는다. 오직 타입과 인터페이스 정의에만 집중한다.

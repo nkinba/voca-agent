@@ -1,7 +1,7 @@
 use serde::Deserialize;
 use serde_json::{json, Value};
-use voca_core::model::Vocabulary;
-use voca_core::port::StoragePort;
+use spread_core::model::Vocabulary;
+use spread_core::port::StoragePort;
 
 use crate::error::IntegrationError;
 
@@ -101,8 +101,8 @@ fn format_vocabulary(vocab: &Vocabulary) -> String {
 mod tests {
     use super::*;
     use async_trait::async_trait;
-    use voca_core::error::CoreError;
-    use voca_core::model::Article;
+    use spread_core::error::CoreError;
+    use spread_core::model::Article;
 
     struct MockStorage {
         vocabs: Vec<Vocabulary>,

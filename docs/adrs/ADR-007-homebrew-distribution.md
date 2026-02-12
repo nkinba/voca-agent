@@ -28,8 +28,8 @@
 ```ruby
 class Spread < Formula
   desc "AI-powered vocabulary extraction agent"
-  homepage "https://github.com/nkinba/voca-agent"
-  url "https://github.com/nkinba/voca-agent/archive/refs/tags/v#{version}.tar.gz"
+  homepage "https://github.com/nkinba/spread"
+  url "https://github.com/nkinba/spread/archive/refs/tags/v#{version}.tar.gz"
   sha256 "..."
   license "MIT"
 

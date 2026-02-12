@@ -1,8 +1,8 @@
 use async_trait::async_trait;
+use spread_core::error::CoreError;
+use spread_core::model::{Article, Vocabulary};
+use spread_core::port::StoragePort;
 use sqlx::SqlitePool;
-use voca_core::error::CoreError;
-use voca_core::model::{Article, Vocabulary};
-use voca_core::port::StoragePort;
 
 const CREATE_ARTICLES_TABLE: &str = r#"
 CREATE TABLE IF NOT EXISTS articles (
@@ -200,7 +200,7 @@ impl StoragePort for SqliteStorage {
 mod tests {
     use super::*;
     use chrono::Utc;
-    use voca_core::model::SourceType;
+    use spread_core::model::SourceType;
 
     #[tokio::test]
     async fn test_article_crud() {

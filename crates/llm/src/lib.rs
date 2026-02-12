@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use voca_core::{CoreError, LlmPort, Vocabulary};
+use spread_core::{CoreError, LlmPort, Vocabulary};
 
 const SYSTEM_PROMPT: &str = r#"You are a strict TOEFL exam creator. Identify 3-5 distinct English words from the text that are CEFR Level C1 or C2. Ignore common words. Output a JSON list of objects with the following keys:
 - 'word': The lemma of the word.

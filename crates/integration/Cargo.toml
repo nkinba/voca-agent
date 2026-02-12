@@ -1,11 +1,11 @@
 [package]
-name = "voca-integration"
+name = "spread-integration"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-voca-core = { path = "../core" }
-voca-storage = { path = "../storage" }
+spread-core = { path = "../core" }
+spread-storage = { path = "../storage" }
 tera = "1"
 tokio = { workspace = true }
 serde = { workspace = true }

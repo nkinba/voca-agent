@@ -1,4 +1,4 @@
-# 📑 Master PRD: Spread (Voca-Agent)
+# 📑 Master PRD: Spread
 
 > AI-powered vocabulary extraction agent for TOEFL-level English learning
 
@@ -37,7 +37,7 @@
 ### 2.2. Directory Structure
 
 ```text
-voca-agent/
+spread/
 ├── Cargo.toml              # Workspace Definition
 ├── Formula/                # Homebrew Formula
 │   └── spread.rb
@@ -85,7 +85,7 @@ SQLite DB ←→ [MCP Server] ←→ Obsidian
 
 ## 3. Module Specifications
 
-### 3.1. `voca-core` (Domain Layer)
+### 3.1. `spread-core` (Domain Layer)
 
 시스템의 핵심 도메인 모델과 포트(인터페이스) 정의.
 
@@ -118,7 +118,7 @@ pub trait LlmPort: Send + Sync {
 }
 ```
 
-### 3.2. `voca-fetcher` (Feed Collector)
+### 3.2. `spread-fetcher` (Feed Collector)
 
 RSS/Atom/JSON Feed를 파싱하여 기사 목록 수집.
 
@@ -126,7 +126,7 @@ RSS/Atom/JSON Feed를 파싱하여 기사 목록 수집.
 - **HTML Parsing:** `scraper` (main content 추출)
 - **Content Selectors:** `article`, `main`, `[role="main"]`, `.content`, `.post-content`
 
-### 3.3. `voca-storage` (Persistence)
+### 3.3. `spread-storage` (Persistence)
 
 SQLite 기반 데이터 영속성.
 
@@ -151,7 +151,7 @@ CREATE TABLE vocabularies (
 );
 ```
 
-### 3.4. `voca-llm` (AI Extraction)
+### 3.4. `spread-llm` (AI Extraction)
 
 Gemini 2.5 Flash를 활용한 TOEFL 수준 어휘 추출.
 
@@ -160,7 +160,7 @@ Gemini 2.5 Flash를 활용한 TOEFL 수준 어휘 추출.
 - **Filtering:** 3자 이하 단어 제외, 104개 불용어 필터링
 - **Output:** JSON 배열 (`word`, `definition`, `context_sentence`)
 
-### 3.5. `voca-notify` (Telegram)
+### 3.5. `spread-notify` (Telegram)
 
 일일 학습 어휘 Telegram 알림.
 
@@ -168,7 +168,7 @@ Gemini 2.5 Flash를 활용한 TOEFL 수준 어휘 추출.
 - **Format:** MarkdownV2
 - **Daily Words:** 기본 3개 (설정 가능)
 
-### 3.6. `voca-integration` (Obsidian & MCP)
+### 3.6. `spread-integration` (Obsidian & MCP)
 
 **Obsidian Exporter:**
 - Markdown 파일 생성 (tera 템플릿)

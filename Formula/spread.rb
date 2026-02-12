@@ -1,7 +1,7 @@
 class Spread < Formula
   desc "Headless TOEFL Vocabulary Builder for Developers"
-  homepage "https://github.com/nkinba/voca-agent"
-  url "https://github.com/nkinba/voca-agent/archive/refs/tags/v0.1.0.tar.gz"
+  homepage "https://github.com/nkinba/spread"
+  url "https://github.com/nkinba/spread/archive/refs/tags/v0.1.0.tar.gz"
   sha256 "PLACEHOLDER_SHA256"
   license "MIT"
 

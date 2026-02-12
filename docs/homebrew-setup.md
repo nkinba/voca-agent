@@ -14,7 +14,7 @@ git init
 
 # Create the Formula directory and copy the formula
 mkdir Formula
-cp /path/to/voca-agent/Formula/spread.rb Formula/
+cp /path/to/spread/Formula/spread.rb Formula/
 
 # Commit and push
 git add .
@@ -29,7 +29,7 @@ For automated formula updates, create a Personal Access Token (PAT):
 
 1. Go to GitHub Settings > Developer settings > Personal access tokens > Tokens (classic)
 2. Generate a new token with `repo` scope
-3. Add the token as a repository secret named `HOMEBREW_TAP_TOKEN` in the `voca-agent` repository
+3. Add the token as a repository secret named `HOMEBREW_TAP_TOKEN` in the `spread` repository
 
 ## 3. Installation
 
@@ -54,7 +54,7 @@ brew install nkinba/tap/spread
 To test the formula locally before publishing:
 
 ```bash
-# From the voca-agent repository root
+# From the spread repository root
 brew install --build-from-source ./Formula/spread.rb
 
 # Verify installation

@@ -29,8 +29,8 @@ GitHub Actions 사용 시 공식 저장소에서 정확한 액션 이름을 확�
 - CI에서 `cargo fmt --check` 실패
 - CI 로그에 로컬에 없는 파일 경로 표시:
   ```
-  Diff in /Users/runner/work/voca-agent/voca-agent/crates/integration/src/mcp/handlers.rs
-  Diff in /Users/runner/work/voca-agent/voca-agent/crates/storage/src/lib.rs
+  Diff in /Users/runner/work/spread/spread/crates/integration/src/mcp/handlers.rs
+  Diff in /Users/runner/work/spread/spread/crates/storage/src/lib.rs
   ```
 
 ### 원인
