@@ -1,12 +1,11 @@
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use rss::Channel;
+use feed_rs::parser;
 use scraper::{Html, Selector};
-use std::io::BufReader;
 
 use voca_core::{Article, CoreError, FetcherPort, SourceType};
 
-/// RSS feed item metadata (URL and title)
+/// Feed item metadata (URL and title)
 #[derive(Debug, Clone)]
 pub struct FeedItem {
     pub url: String,
@@ -25,7 +24,7 @@ impl RssFetcher {
         }
     }
 
-    /// Fetch all items from an RSS feed
+    /// Fetch all items from a feed (RSS or Atom)
     pub async fn fetch_feed(&self, feed_url: &str) -> Result<Vec<FeedItem>, CoreError> {
         let response = self
             .client
@@ -39,19 +38,22 @@ impl RssFetcher {
             .await
             .map_err(|e| CoreError::Network(e.to_string()))?;
 
-        let channel = Channel::read_from(BufReader::new(bytes.as_ref()))
+        let feed = parser::parse(bytes.as_ref())
             .map_err(|e| CoreError::Parse(e.to_string()))?;
 
-        let items: Vec<FeedItem> = channel
-            .items()
+        let items: Vec<FeedItem> = feed
+            .entries
             .iter()
-            .filter_map(|item| {
-                let url = item.link()?.to_string();
-                let title = item.title().unwrap_or("Untitled").to_string();
-                let published_at = item
-                    .pub_date()
-                    .and_then(|d| DateTime::parse_from_rfc2822(d).ok())
-                    .map(|dt| dt.with_timezone(&Utc))
+            .filter_map(|entry| {
+                let url = entry.links.first()?.href.clone();
+                let title = entry
+                    .title
+                    .as_ref()
+                    .map(|t| t.content.clone())
+                    .unwrap_or_else(|| "Untitled".to_string());
+                let published_at = entry
+                    .published
+                    .or(entry.updated)
                     .unwrap_or_else(Utc::now);
 
                 Some(FeedItem {
@@ -144,32 +146,39 @@ impl FetcherPort for RssFetcher {
             .await
             .map_err(|e| CoreError::Network(e.to_string()))?;
 
-        // 2. 응답 본문을 rss::Channel::read_from으로 파싱
-        let channel = Channel::read_from(BufReader::new(bytes.as_ref()))
+        // 2. feed-rs로 파싱 (RSS, Atom, JSON Feed 자동 감지)
+        let feed = parser::parse(bytes.as_ref())
             .map_err(|e| CoreError::Parse(e.to_string()))?;
 
         // 3. 가장 최신 Item 하나 추출
-        let item = channel
-            .items()
+        let entry = feed
+            .entries
             .first()
-            .ok_or_else(|| CoreError::Parse("No items found in RSS feed".to_string()))?;
+            .ok_or_else(|| CoreError::Parse("No items found in feed".to_string()))?;
 
-        // 4. Item -> Article 변환
-        let title = item.title().unwrap_or("Untitled").to_string();
+        // 4. Entry -> Article 변환
+        let title = entry
+            .title
+            .as_ref()
+            .map(|t| t.content.clone())
+            .unwrap_or_else(|| "Untitled".to_string());
 
-        let content = item
-            .description()
-            .or_else(|| item.content())
-            .unwrap_or("")
-            .to_string();
+        let content = entry
+            .summary
+            .as_ref()
+            .map(|s| s.content.clone())
+            .or_else(|| entry.content.as_ref().and_then(|c| c.body.clone()))
+            .unwrap_or_default();
 
-        let link = item.link().unwrap_or(url).to_string();
+        let link = entry
+            .links
+            .first()
+            .map(|l| l.href.clone())
+            .unwrap_or_else(|| url.to_string());
 
-        // pub_date를 RFC2822로 파싱
-        let published_at = item
-            .pub_date()
-            .and_then(|d| DateTime::parse_from_rfc2822(d).ok())
-            .map(|dt| dt.with_timezone(&Utc))
+        let published_at = entry
+            .published
+            .or(entry.updated)
             .unwrap_or_else(Utc::now);
 
         let collected_at = Utc::now();
@@ -210,15 +219,60 @@ mod tests {
   </channel>
 </rss>"#;
 
-    #[test]
-    fn test_parse_rss_channel() {
-        let channel = Channel::read_from(BufReader::new(SAMPLE_RSS.as_bytes())).unwrap();
-        assert_eq!(channel.title(), "Test Feed");
-        assert_eq!(channel.items().len(), 2);
+    const SAMPLE_ATOM: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Rust Blog</title>
+  <link href="https://blog.rust-lang.org/" rel="alternate"/>
+  <id>https://blog.rust-lang.org/</id>
+  <updated>2024-01-15T00:00:00+00:00</updated>
+  <entry>
+    <title>Rust 1.75 Released</title>
+    <link href="https://blog.rust-lang.org/2024/01/15/rust-1.75.html" rel="alternate"/>
+    <id>https://blog.rust-lang.org/2024/01/15/rust-1.75.html</id>
+    <published>2024-01-15T00:00:00+00:00</published>
+    <updated>2024-01-15T00:00:00+00:00</updated>
+    <summary>The Rust team has published a new version of Rust, 1.75.</summary>
+  </entry>
+  <entry>
+    <title>Older Rust Post</title>
+    <link href="https://blog.rust-lang.org/2023/12/01/old-post.html" rel="alternate"/>
+    <id>https://blog.rust-lang.org/2023/12/01/old-post.html</id>
+    <published>2023-12-01T00:00:00+00:00</published>
+    <updated>2023-12-01T00:00:00+00:00</updated>
+    <summary>An older blog post.</summary>
+  </entry>
+</feed>"#;
 
-        let first_item = channel.items().first().unwrap();
-        assert_eq!(first_item.title(), Some("Test Article"));
-        assert_eq!(first_item.link(), Some("https://example.com/article1"));
+    #[test]
+    fn test_parse_rss_feed() {
+        let feed = parser::parse(SAMPLE_RSS.as_bytes()).unwrap();
+        assert_eq!(feed.title.unwrap().content, "Test Feed");
+        assert_eq!(feed.entries.len(), 2);
+
+        let first_entry = feed.entries.first().unwrap();
+        assert_eq!(first_entry.title.as_ref().unwrap().content, "Test Article");
+        assert_eq!(
+            first_entry.links.first().unwrap().href,
+            "https://example.com/article1"
+        );
+    }
+
+    #[test]
+    fn test_parse_atom_feed() {
+        let feed = parser::parse(SAMPLE_ATOM.as_bytes()).unwrap();
+        assert_eq!(feed.title.unwrap().content, "Rust Blog");
+        assert_eq!(feed.entries.len(), 2);
+
+        let first_entry = feed.entries.first().unwrap();
+        assert_eq!(
+            first_entry.title.as_ref().unwrap().content,
+            "Rust 1.75 Released"
+        );
+        assert_eq!(
+            first_entry.links.first().unwrap().href,
+            "https://blog.rust-lang.org/2024/01/15/rust-1.75.html"
+        );
+        assert!(first_entry.published.is_some());
     }
 
     #[test]
@@ -232,14 +286,14 @@ mod tests {
   </channel>
 </rss>"#;
 
-        let channel = Channel::read_from(BufReader::new(empty_rss.as_bytes())).unwrap();
-        assert!(channel.items().is_empty());
+        let feed = parser::parse(empty_rss.as_bytes()).unwrap();
+        assert!(feed.entries.is_empty());
     }
 
     #[test]
     fn test_parse_invalid_xml() {
         let invalid_xml = "this is not valid xml";
-        let result = Channel::read_from(BufReader::new(invalid_xml.as_bytes()));
+        let result = parser::parse(invalid_xml.as_bytes());
         assert!(result.is_err());
     }
 

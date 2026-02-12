@@ -23,7 +23,7 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
 # HTTP & Parsing
 reqwest = { version = "0.12", features = ["json"] }
-rss = "2"
+feed-rs = "2"
 scraper = "0.20"
 
 # Database
