@@ -90,6 +90,9 @@ brew install spread
 git clone https://github.com/nkinba/voca-agent.git
 cd voca-agent
 cargo build --release
+
+# pre-commit hook 설치 (개발 시 필수)
+pre-commit install
 ```
 
 ### 환경 변수 설정
